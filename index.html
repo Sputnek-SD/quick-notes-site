@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quick Notes — A private notes app for Windows and Android</title>
+  <meta name="description" content="Quick Notes is a private notes app for Windows and Android. Notes, folders, tags, comments, and pictures stay in sync. No ads, no analytics, no selling of data.">
+  <meta name="theme-color" content="#6b57f5">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop offset='0' stop-color='%237a5cff'/%3E%3Cstop offset='1' stop-color='%23ec5fa6'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='14' fill='url(%23g)'/%3E%3C/svg%3E">
+  <style>
+    :root {
+      --font: Inter, "Segoe UI", ui-sans-serif, system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+      --bg: #f7f6fb;
+      --surface: #ffffff;
+      --sidebar: #f6f6f4;
+      --text: #1d1d22;
+      --text-2: #55555f;
+      --muted: #8c8c96;
+      --border: #e9e9ec;
+      --border-strong: #dcdce1;
+      --accent: #6b57f5;
+      --accent-2: #8b5cf6;
+      --accent-text: #5a45e6;
+      --accent-soft: rgba(107, 87, 245, 0.1);
+      --on-accent: #fff;
+      --pink: #ec5fa6;
+      --green: #2fb57c;
+      --blue: #3d8bf2;
+      --orange: #f5913e;
+      --yellow: #e8b931;
+      --shadow-sm: 0 1px 2px rgba(20, 20, 30, 0.06), 0 1px 1px rgba(20, 20, 30, 0.04);
+      --shadow-md: 0 4px 14px -2px rgba(20, 20, 40, 0.12), 0 2px 4px rgba(20, 20, 40, 0.05);
+      --shadow-lg: 0 22px 50px -16px rgba(40, 20, 80, 0.28), 0 8px 18px rgba(20, 20, 40, 0.08);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: var(--font);
+      font-size: 16px;
+      line-height: 1.55;
+      background:
+        radial-gradient(920px 520px at 8% -8%, rgba(139, 92, 246, 0.18), transparent 58%),
+        radial-gradient(700px 420px at 100% 0%, rgba(236, 95, 166, 0.14), transparent 52%),
+        radial-gradient(640px 380px at 90% 100%, rgba(107, 87, 245, 0.09), transparent 55%),
+        var(--bg);
+      -webkit-font-smoothing: antialiased;
+      text-rendering: optimizeLegibility;
+    }
+    a { color: var(--accent-text); text-underline-offset: 3px; }
+    a:hover { color: var(--accent); }
+    img, svg { display: block; }
+    .wrap { width: min(1120px, calc(100% - 40px)); margin-inline: auto; }
+    header {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: rgba(247, 246, 251, 0.78);
+      border-bottom: 1px solid rgba(233, 233, 236, 0.7);
+    }
+    .nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 68px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      font-size: 16px;
+    }
+    .brand:hover { color: var(--text); }
+    .logo {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      box-shadow: 0 4px 10px -3px rgba(90, 40, 160, 0.45);
+    }
+    nav ul { display: flex; gap: 6px; list-style: none; margin: 0; padding: 0; }
+    nav a {
+      display: inline-flex;
+      align-items: center;
+      height: 36px;
+      padding: 0 12px;
+      border-radius: 9px;
+      color: var(--text-2);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    nav a:hover { background: rgba(30, 30, 40, 0.05); color: var(--text); }
+    nav a.btn {
+      margin-left: 6px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: var(--on-accent);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 6px 14px -6px rgba(107, 87, 245, 0.8);
+    }
+    nav a.btn:hover { color: var(--on-accent); filter: brightness(1.06); }
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+      gap: 56px;
+      align-items: center;
+      padding: 64px 0 40px;
+    }
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 16px;
+      padding: 5px 11px 5px 7px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.72);
+      color: var(--accent-text);
+      font-size: 12.5px;
+      font-weight: 650;
+      letter-spacing: 0.01em;
+    }
+    .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--pink));
+      box-shadow: 0 0 0 3px var(--accent-soft);
+    }
+    h1 {
+      margin: 0 0 16px;
+      font-size: clamp(36px, 5vw, 60px);
+      line-height: 1.05;
+      letter-spacing: -0.038em;
+      font-weight: 740;
+    }
+    .lede {
+      margin: 0 0 28px;
+      max-width: 36em;
+      color: var(--text-2);
+      font-size: 18.5px;
+      line-height: 1.55;
+    }
+    .cta { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+    .cta .primary, .cta .ghost {
+      display: inline-flex;
+      align-items: center;
+      height: 44px;
+      padding: 0 16px;
+      border-radius: 11px;
+      font-size: 14.5px;
+      font-weight: 650;
+      text-decoration: none;
+    }
+    .cta .primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: var(--on-accent);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.25) inset, 0 8px 18px -6px rgba(107, 87, 245, 0.75);
+    }
+    .cta .primary:hover { color: var(--on-accent); filter: brightness(1.06); }
+    .cta .ghost {
+      color: var(--text);
+      background: rgba(255,255,255,0.75);
+      border: 1px solid var(--border-strong);
+    }
+    .cta .ghost:hover { color: var(--text); background: #fff; }
+    .platforms {
+      display: flex;
+      gap: 16px;
+      margin-top: 22px;
+      color: var(--text-2);
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .platforms span { display: inline-flex; align-items: center; gap: 7px; }
+    .platforms svg { width: 16px; height: 16px; }
+    .app {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      min-height: 390px;
+      transform: rotate(-0.6deg);
+    }
+    .side {
+      background: var(--sidebar);
+      border-right: 1px solid var(--border);
+      padding: 14px 12px;
+    }
+    .side-brand { display: flex; align-items: center; gap: 8px; font-size: 12.5px; font-weight: 700; margin-bottom: 12px; }
+    .side-brand .logo { width: 18px; height: 18px; border-radius: 5px; box-shadow: none; }
+    .new {
+      display: flex; align-items: center; justify-content: center;
+      height: 30px; margin-bottom: 12px;
+      border-radius: 8px; color: #fff; font-size: 12px; font-weight: 650;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 8px;
+      height: 28px; padding: 0 8px; border-radius: 7px;
+      font-size: 12px; color: var(--text-2);
+    }
+    .nav-item.active { background: var(--accent-soft); color: var(--accent-text); font-weight: 650; }
+    .label { margin: 12px 8px 4px; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; color: var(--muted); text-transform: uppercase; }
+    .note-mini {
+      display: block; padding: 8px 9px; margin-bottom: 6px;
+      border-radius: 9px; background: #fff;
+      box-shadow: var(--shadow-sm); border: 1px solid var(--border);
+    }
+    .note-mini strong { display: block; font-size: 12px; letter-spacing: -0.01em; }
+    .note-mini em { display: block; margin-top: 2px; font-style: normal; font-size: 11px; color: var(--muted); }
+    .note-mini.current { box-shadow: var(--shadow-md); }
+    .bar { width: 3px; height: 28px; border-radius: 2px; flex-shrink: 0; margin-right: 2px; }
+    .main { padding: 22px 24px 24px; }
+    .crumbs { display: flex; gap: 6px; margin-bottom: 10px; }
+    .pill { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; background: #f3f0ff; color: var(--accent-text); font-size: 11px; font-weight: 650; }
+    .pill.blue { background: #e7f1ff; color: #2563c9; }
+    .main h2 { margin: 0 0 12px; font-size: 26px; letter-spacing: -0.03em; }
+    .main p, .main li { font-size: 13.5px; color: var(--text-2); }
+    .main ul { margin: 0; padding: 0; list-style: none; }
+    .main li { display: flex; align-items: flex-start; gap: 8px; margin: 0 0 7px; }
+    .chk {
+      width: 15px; height: 15px; margin-top: 2px; border-radius: 4px; flex-shrink: 0;
+      border: 1.5px solid #c7bdf0;
+    }
+    .chk.on { background: var(--accent); border-color: var(--accent); background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill='none' stroke='%23fff' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round' d='M3.5 8.2l3 3 6-6.5'/%3E%3C/svg%3E"); background-size: 11px; background-repeat: no-repeat; background-position: center; }
+    .hl { background: #fff1a8; padding: 0 3px; border-radius: 3px; color: var(--text); }
+    .features { padding: 8px 0 64px; }
+    .features h2, .trust h2 {
+      margin: 0 0 8px;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+      text-align: center;
+    }
+    .sub {
+      margin: 0 auto 28px;
+      max-width: 36em;
+      text-align: center;
+      color: var(--text-2);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 22px 22px 20px;
+      box-shadow: var(--shadow-sm);
+    }
+    .icon {
+      width: 40px; height: 40px; border-radius: 12px;
+      display: grid; place-items: center; margin-bottom: 14px;
+    }
+    .icon svg { width: 20px; height: 20px; }
+    .card h3 { margin: 0 0 6px; font-size: 16.5px; letter-spacing: -0.02em; }
+    .card p { margin: 0; color: var(--text-2); font-size: 14.5px; line-height: 1.55; }
+    .trust { padding: 0 0 80px; }
+    .trust-box {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 28px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 36px 40px;
+      box-shadow: var(--shadow-md);
+    }
+    .checks { list-style: none; margin: 16px 0 0; padding: 0; }
+    .checks li { display: flex; gap: 10px; align-items: flex-start; margin: 0 0 10px; color: var(--text-2); }
+    .tick {
+      width: 20px; height: 20px; border-radius: 50%; flex-shrink: 0; margin-top: 1px;
+      background: #e9f8f0; color: #1f9a62;
+      display: grid; place-items: center;
+    }
+    .tick svg { width: 12px; height: 12px; }
+    .aside {
+      background: linear-gradient(180deg, #f8f5ff, #fff);
+      border: 1px solid #ece7ff;
+      border-radius: 16px;
+      padding: 22px;
+    }
+    .aside h3 { margin: 0 0 8px; font-size: 16px; letter-spacing: -0.02em; }
+    .aside p { margin: 0; color: var(--text-2); font-size: 14.5px; }
+    footer {
+      border-top: 1px solid var(--border);
+      background: rgba(255,255,255,0.55);
+      padding: 28px 0 36px;
+    }
+    .foot {
+      display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap;
+      align-items: center; color: var(--text-2); font-size: 13.5px;
+    }
+    .foot a { color: var(--text-2); text-decoration: none; font-weight: 600; }
+    .foot a:hover { color: var(--accent-text); }
+    .foot-links { display: flex; gap: 16px; }
+    @media (max-width: 900px) {
+      .hero, .trust-box, .grid { grid-template-columns: 1fr; }
+      .hero { padding: 40px 0 32px; gap: 32px; }
+      .app { transform: none; }
+      .trust-box { padding: 24px 22px; }
+    }
+    @media (max-width: 640px) {
+      .wrap { width: calc(100% - 28px); }
+      nav a.btn { display: none; }
+      .lede { font-size: 16.5px; }
+      .app { grid-template-columns: 1fr; min-height: 0; }
+      .side { display: none; }
+      .main { padding: 18px 18px 20px; }
+      .features { padding-bottom: 48px; }
+      .trust { padding-bottom: 56px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap nav">
+      <a class="brand" href="index.html">
+        <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#7a5cff"/>
+              <stop offset="0.55" stop-color="#9b5cf6"/>
+              <stop offset="1" stop-color="#ec5fa6"/>
+            </linearGradient>
+          </defs>
+          <rect width="64" height="64" rx="14" fill="url(#lg)"/>
+          <path d="M16 14h22l10 10v26a5 5 0 0 1-5 5H16a5 5 0 0 1-5-5V19a5 5 0 0 1 5-5z" fill="#fff"/>
+          <path d="M38 14v8a3 3 0 0 0 3 3h8z" fill="#e4dcff"/>
+          <rect x="20" y="30" width="8" height="8" rx="2" fill="#7a5cff"/>
+          <path d="M21.7 34.1l2.1 2.1 3.6-4" fill="none" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/>
+          <rect x="30.5" y="32" width="16" height="4" rx="2" fill="#d9d2f5"/>
+          <rect x="20.5" y="41.5" width="7" height="7" rx="2" fill="none" stroke="#c7bdf0" stroke-width="1.4"/>
+          <rect x="30.5" y="43" width="14" height="4" rx="2" fill="#ffd84d"/>
+        </svg>
+        Quick Notes
+      </a>
+      <nav>
+        <ul>
+          <li><a href="privacy.html">Privacy</a></li>
+          <li><a href="mailto:blipetzky@gmail.com">Contact</a></li>
+          <li><a class="btn" href="privacy.html">Privacy policy</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="wrap hero">
+      <div>
+        <p class="eyebrow"><span class="dot"></span> A private notes app for home</p>
+        <h1>Your notes, on every device.</h1>
+        <p class="lede">Quick Notes is a personal notes app for Windows and Android. Write something on your phone, and it shows up on your PC a moment later — folders, tags, pictures, and all.</p>
+        <div class="cta">
+          <a class="primary" href="privacy.html">Read the privacy policy</a>
+          <a class="ghost" href="mailto:blipetzky@gmail.com">Email Brad</a>
+        </div>
+        <div class="platforms">
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="4" y="5" width="16" height="12" rx="1.8"/><path d="M8 19h8" stroke-linecap="round"/></svg>
+            Windows
+          </span>
+          <span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18.5h2" stroke-linecap="round"/></svg>
+            Android
+          </span>
+        </div>
+      </div>
+
+      <aside class="app" aria-hidden="true">
+        <div class="side">
+          <div class="side-brand">
+            <svg class="logo" viewBox="0 0 64 64"><defs><linearGradient id="lg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#7a5cff"/><stop offset="1" stop-color="#ec5fa6"/></linearGradient></defs><rect width="64" height="64" rx="14" fill="url(#lg2)"/></svg>
+            Quick Notes
+          </div>
+          <div class="new">+ New note</div>
+          <div class="nav-item active">All notes</div>
+          <div class="nav-item">Reminders</div>
+          <div class="label">Folders</div>
+          <div class="nav-item">Work</div>
+          <div class="nav-item">Home</div>
+          <div class="label">Pinned</div>
+          <div class="note-mini current">
+            <strong>Weekly groceries</strong>
+            <em>Milk, eggs, bread…</em>
+          </div>
+          <div class="note-mini">
+            <strong>Lisbon trip ideas</strong>
+            <em>Long weekend in May</em>
+          </div>
+        </div>
+        <div class="main">
+          <div class="crumbs">
+            <span class="pill">Home</span>
+            <span class="pill blue">#errands</span>
+          </div>
+          <h2>Weekly groceries</h2>
+          <ul>
+            <li><span class="chk on"></span> Milk</li>
+            <li><span class="chk on"></span> Eggs</li>
+            <li><span class="chk"></span> Sourdough from the <span class="hl">market</span></li>
+            <li><span class="chk"></span> Coffee beans</li>
+            <li><span class="chk"></span> Apples and berries</li>
+          </ul>
+        </div>
+      </aside>
+    </section>
+
+    <section class="wrap features">
+      <h2>Everything you need, nothing you don’t.</h2>
+      <p class="sub">Built for everyday notes at home — and designed so your words stay yours.</p>
+      <div class="grid">
+        <article class="card">
+          <div class="icon" style="background:#efeaff;color:#5a45e6">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M8 7H6a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-2"/><rect x="8" y="3" width="12" height="14" rx="2"/></svg>
+          </div>
+          <h3>Sync in seconds</h3>
+          <p>Sign in with a code emailed to you. Notes, folders, tags, comments, and trash stay in sync, with access rules so each person only sees what they’re meant to see.</p>
+        </article>
+        <article class="card">
+          <div class="icon" style="background:#e9f8f0;color:#1f9a62">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h6l2 2h8v10H4z"/></svg>
+          </div>
+          <h3>Folders, tags, and color</h3>
+          <p>Organize the way you already think. Pin what matters, leave a comment, move something to the trash, and find it again with search.</p>
+        </article>
+        <article class="card">
+          <div class="icon" style="background:#e7f1ff;color:#2563c9">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="11" r="2"/><path d="M3 17l5-4 3 2 4-4 6 6"/></svg>
+          </div>
+          <h3>Pictures in your Drive</h3>
+          <p>Photos and files you add to a note live in a Quick Notes folder in your own Google Drive. By default, the app can only touch files it creates.</p>
+        </article>
+        <article class="card">
+          <div class="icon" style="background:#fff3e6;color:#c56a16">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/><path d="M8 13h8M8 17h6"/></svg>
+          </div>
+          <h3>Share as a Google Doc</h3>
+          <p>When you want to send a note outside the app, Quick Notes can make a Google Doc copy — only when you ask it to.</p>
+        </article>
+        <article class="card">
+          <div class="icon" style="background:#ffe9f3;color:#c43b7a">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M9 16v4M15 16v4"/></svg>
+          </div>
+          <h3>Windows and Android</h3>
+          <p>The same app on a PC and a phone, including foldables and tablets, so a list you start in the kitchen is waiting on your desk.</p>
+        </article>
+        <article class="card">
+          <div class="icon" style="background:#fff6d8;color:#a17a10">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          </div>
+          <h3>Private by design</h3>
+          <p>No ads, no analytics, and no selling or sharing of your data. What’s in your notes is used only to provide the app.</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="wrap trust">
+      <div class="trust-box">
+        <div>
+          <h2 style="text-align:left">Your data stays in your accounts.</h2>
+          <ul class="checks">
+            <li><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6.2l2.6 2.6L10 3.4"/></svg></span> Notes sync through a private project with per-user access rules.</li>
+            <li><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6.2l2.6 2.6L10 3.4"/></svg></span> Google Drive is used only for pictures, attachments, and Docs you choose to create.</li>
+            <li><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6.2l2.6 2.6L10 3.4"/></svg></span> You can disconnect Google at any time from your Google Account permissions.</li>
+            <li><span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6.2l2.6 2.6L10 3.4"/></svg></span> This website is a static page. It does not use cookies, ads, or analytics.</li>
+          </ul>
+        </div>
+        <aside class="aside">
+          <h3>Want the details?</h3>
+          <p>The privacy policy explains how sign-in, sync, and Google Drive work, including the Limited Use disclosure for Google user data.</p>
+          <div class="cta" style="margin-top:16px">
+            <a class="primary" href="privacy.html">Privacy policy</a>
+          </div>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="wrap foot">
+      <div>© 2026 Quick Notes · A personal app by Brad Lipetzky</div>
+      <div class="foot-links">
+        <a href="privacy.html">Privacy policy</a>
+        <a href="mailto:blipetzky@gmail.com">blipetzky@gmail.com</a>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
